@@ -26,9 +26,6 @@ namespace MuMech {
             double VR21, VT21, VR22, VT22;
             int n;
 
-            double r1mag = R1.magnitude;
-            double r2mag = R2.magnitude;
-
             Vector3d ur1xv1 = Vector3d.Cross(R1, V1).normalized;
 
             Vector3d ux1 = R1.normalized;
@@ -38,31 +35,11 @@ namespace MuMech {
 
             /* calculate the minimum transfer angle (radians) */
 
-            double theta = Vector3d.Dot(ux1, ux2);
-
-            if (theta > 1.0) {
-                theta = 1.0;
-            }
-
-            if (theta < -1.0) {
-                theta = -1.0;
-            }
-
-            theta = Math.Acos(theta);
+            double theta = Math.Acos(MuUtils.Clamp(Vector3d.Dot(ux1, ux2), -1.0, 1.0));
 
             /* calculate the angle between the orbit normal of the initial orbit and the fundamental reference plane */
 
-            double angle_to_on = Vector3d.Dot(ur1xv1, uz1);
-
-            if (angle_to_on > 1.0) {
-                angle_to_on = 1.0;
-            }
-
-            if (angle_to_on < -1.0) {
-                angle_to_on = -1.0;
-            }
-
-            angle_to_on = Math.Acos(angle_to_on);
+            double angle_to_on = Math.Acos(MuUtils.Clamp(Vector3d.Dot(ur1xv1, uz1), -1.0, 1.0));
 
             /* if angle to orbit normal is greater than 90 degrees and posigrade orbit, then flip the orbit normal and the transfer angle */
 
@@ -84,7 +61,7 @@ namespace MuMech {
 
             theta = theta + 2.0 * Math.PI * Math.Abs(nrev);
 
-            VLAMB(primary.gravParameter, r1mag, r2mag, theta, tof, out n, out VR11, out VT11, out VR12, out VT12, out VR21, out VT21, out VR22, out VT22);
+            VLAMB(primary.gravParameter, R1.magnitude, R2.magnitude, theta, tof, out n, out VR11, out VT11, out VR12, out VT12, out VR21, out VT21, out VR22, out VT22);
 
             if (nrev > 0) {
                 if (n == -1) {
